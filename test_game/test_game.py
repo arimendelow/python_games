@@ -2,10 +2,7 @@ import pygame
 pygame.init() # Always need to do this
 
 # Load the images
-walkRight = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png'), pygame.image.load('R4.png'), pygame.image.load('R5.png'), pygame.image.load('R6.png'), pygame.image.load('R7.png'), pygame.image.load('R8.png'), pygame.image.load('R9.png')]
-walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.image.load('L3.png'), pygame.image.load('L4.png'), pygame.image.load('L5.png'), pygame.image.load('L6.png'), pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
 bg = pygame.image.load('bg.jpg')
-char = pygame.image.load('standing.png')
 
 # Allow us to change our FPS
 clock = pygame.time.Clock()
@@ -16,14 +13,25 @@ screenWidth = 640
 screenHeight = 480
 win = pygame.display.set_mode((screenWidth, screenHeight)) # Giving it a touple with the size of the window
 
-# setting our character constants
+# Setting our character constants
 characterWidth = 64
 characterHeight = 64
+
+# Colors used throughout
+black = (0, 0, 0,)
+red = (255, 0, 0,)
+
+# Track score
+score = 0
 
 
 pygame.display.set_caption("First Game") # Give the window a title
 
 class player(object):
+	# Load images
+	walkRight = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png'), pygame.image.load('R4.png'), pygame.image.load('R5.png'), pygame.image.load('R6.png'), pygame.image.load('R7.png'), pygame.image.load('R8.png'), pygame.image.load('R9.png')]
+	walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.image.load('L3.png'), pygame.image.load('L4.png'), pygame.image.load('L5.png'), pygame.image.load('L6.png'), pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
+
 	def __init__(self, width, height, x, y):
 		# setting our character constants
 		self.width = width
@@ -56,21 +64,21 @@ class player(object):
 		# If not standing, walking. So animate that
 		if not(self.standing):
 			if self.left:
-				win.blit(walkLeft[self.walkCount // 3], (self.x, self.y))
+				win.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
 				self.walkCount += 1
 			elif self.right:
-				win.blit(walkRight[self.walkCount // 3], (self.x, self.y))
+				win.blit(self.walkRight[self.walkCount // 3], (self.x, self.y))
 				self.walkCount += 1
 		else: # Otherwise, standing still or jumping
 			# Only states when standing still are facing right and left
 			if self.right:
-				win.blit(walkRight[0], (self.x, self.y)) # Show first image in walkRight array
+				win.blit(self.walkRight[0], (self.x, self.y)) # Show first image in walkRight array
 			else:
-				win.blit(walkLeft[0], (self.x, self.y)) # Show first image in walkLeft array
+				win.blit(self.walkLeft[0], (self.x, self.y)) # Show first image in walkLeft array
 		
 		# Draw the characters hitbox, for testing
 		self.hitbox = (self.x + 20, self.y + 12, 22, 50) # Update the hitbox's location
-		pygame.draw.rect(win, (255, 0, 0,), self.hitbox, 2)
+		pygame.draw.rect(win, red, self.hitbox, 2)
 
 class projectile(object):
 	def __init__(self, x, y, radius, color, facing):
@@ -85,6 +93,7 @@ class projectile(object):
 		pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
 class enemy(object):
+	# Load images
 	walkRight = [pygame.image.load('R1E.png'), pygame.image.load('R2E.png'), pygame.image.load('R3E.png'), pygame.image.load('R4E.png'), pygame.image.load('R5E.png'), pygame.image.load('R6E.png'), pygame.image.load('R7E.png'), pygame.image.load('R8E.png'), pygame.image.load('R9E.png'), pygame.image.load('R10E.png'), pygame.image.load('R11E.png')]
 	walkLeft = [pygame.image.load('L1E.png'), pygame.image.load('L2E.png'), pygame.image.load('L3E.png'), pygame.image.load('L4E.png'), pygame.image.load('L5E.png'), pygame.image.load('L6E.png'), pygame.image.load('L7E.png'), pygame.image.load('L8E.png'), pygame.image.load('L9E.png'), pygame.image.load('L10E.png'), pygame.image.load('L11E.png')]
 
@@ -139,6 +148,10 @@ def redrawGameWindow():
 	# Put the BG pic
 	win.blit(bg, (0,0))
 
+	# Show the score
+	text = font.render('Score:' + str(score), 1, black)
+	win.blit(text, (10, 10))
+
 	# Draw the characters
 	p1.draw(win)
 	e1.draw(win)
@@ -161,10 +174,12 @@ e1 = enemy(width = characterWidth,
 	y = screenHeight -  characterWidth - 10,
 	end = screenWidth - 150)
 projectiles = []
-run = True
-
 # For making each press of the spacebar cause only one shot
 space_up = True
+# For score displaying
+font = pygame.font.Font('pixelmix_bold.ttf', 30) # Size 30
+
+run = True
 while run:
 	# Give loop a time delay - like a clock in the game
 	clock.tick(fps) # Set to 27 FPS
@@ -182,6 +197,7 @@ while run:
 			if ammo.x - ammo.radius < e1.hitbox[0] + e1.hitbox[2] and ammo.x + ammo.radius > e1.hitbox[0]:
 				# ...then the ammo is totally in the hitbox, and we have collision
 				e1.hit()
+				score += 1
 				projectiles.pop(projectiles.index(ammo))
 
 		# If ammo is on the screen
@@ -204,7 +220,7 @@ while run:
 			facing = 1
 		# Make sure the ammo is coming from the middle of the man
 		# Setting radius to 5 and color to black (RGB)
-		projectiles.append(projectile(round(p1.x + p1.width // 2), round(p1.y + p1.height // 2), 5, (0, 0, 0,), facing))
+		projectiles.append(projectile(round(p1.x + p1.width // 2), round(p1.y + p1.height // 2), 5, black, facing))
 	# If the spacebar has been released, flip this boolean so that another ammo can be shot
 	if not keys[pygame.K_SPACE]:
 		space_up = True
