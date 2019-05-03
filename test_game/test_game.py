@@ -20,6 +20,7 @@ win = pygame.display.set_mode((screenWidth, screenHeight)) # Giving it a touple 
 characterWidth = 64
 characterHeight = 64
 
+
 pygame.display.set_caption("First Game") # Give the window a title
 
 class player(object):
@@ -76,13 +77,55 @@ class projectile(object):
 	def draw(self, win):
 		pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
+class enemy(object):
+	walkRight = [pygame.image.load('R1E.png'), pygame.image.load('R2E.png'), pygame.image.load('R3E.png'), pygame.image.load('R4E.png'), pygame.image.load('R5E.png'), pygame.image.load('R6E.png'), pygame.image.load('R7E.png'), pygame.image.load('R8E.png'), pygame.image.load('R9E.png'), pygame.image.load('R10E.png'), pygame.image.load('R11E.png')]
+	walkLeft = [pygame.image.load('L1E.png'), pygame.image.load('L2E.png'), pygame.image.load('L3E.png'), pygame.image.load('L4E.png'), pygame.image.load('L5E.png'), pygame.image.load('L6E.png'), pygame.image.load('L7E.png'), pygame.image.load('L8E.png'), pygame.image.load('L9E.png'), pygame.image.load('L10E.png'), pygame.image.load('L11E.png')]
+
+	def __init__(self, width, height, x, y, end):
+		# setting our enemy constants
+		self.width = width
+		self.height = height
+		self.x = x
+		self.y = y
+		self.end = end
+		self.path = [self.x, self.end] # Track where we're starting and ending
+		self.walkCount = 0 # For knowing which image we're on
+		self.vel = 3
+	
+	def draw(self, win):
+		self.move()
+		if self.walkCount + 1 >= 33: # 33 because 11 images
+			self.walkCount = 0
+		if self.vel > 0: # Moving right
+			win.blit(self.walkRight[self.walkCount // 3], (self.x, self.y))
+			self.walkCount += 1
+		else: # Moving left
+			win.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
+			self.walkCount += 1
+	
+	# Just going to move side to side
+	def move(self):
+		if self.vel > 0: # If moving to the right
+			if self.x + self.vel < self.path[1]:
+				self.x += self.vel
+			else:
+				self.vel *= -1
+				self.walkCount = 0
+		else: # If moving to the left
+			if self.x - self.vel > self.path[0]:
+				self.x += self.vel
+			else:
+				self.vel *= -1
+				self.walkCount = 0
+
 
 def redrawGameWindow():
 	# Put the BG pic
 	win.blit(bg, (0,0))
 
-	# Draw the character
+	# Draw the characters
 	p1.draw(win)
+	e1.draw(win)
 
 	# Draw the projectiles
 	for ammo in projectiles:
@@ -92,7 +135,15 @@ def redrawGameWindow():
 	pygame.display.update()
 
 # Main loop
-p1 = player(characterWidth, characterHeight, screenWidth // 2, screenHeight -  characterWidth - 10) # -10 to put it 10px above the bottom
+p1 = player(width = characterWidth,
+	height = characterHeight,
+	x = screenWidth // 2,
+	y = screenHeight -  characterWidth - 10) # -10 to put it 10px above the bottom
+e1 = enemy(width = characterWidth,
+	height = characterHeight,
+	x = 150,
+	y = screenHeight -  characterWidth - 10,
+	end = screenWidth - 150)
 projectiles = []
 run = True
 while run:
