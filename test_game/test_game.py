@@ -41,9 +41,12 @@ class player(object):
 		self.standing = True
 		
 		# Need to know which frame is on the screen so that we can accurately display it
-		self.left = False
+		self.left = True
 		self.right = False
 		self.walkCount = 0
+
+		# Hitbox, for collision
+		self.hitbox = (self.x + 20, self.y + 12, 22, 50)
 	
 	def draw(self, win):
 		# If walkCount goes over 27 (fps), we'll run out of sprites
@@ -64,6 +67,10 @@ class player(object):
 				win.blit(walkRight[0], (self.x, self.y)) # Show first image in walkRight array
 			else:
 				win.blit(walkLeft[0], (self.x, self.y)) # Show first image in walkLeft array
+		
+		# Draw the characters hitbox, for testing
+		self.hitbox = (self.x + 20, self.y + 12, 22, 50) # Update the hitbox's location
+		pygame.draw.rect(win, (255, 0, 0,), self.hitbox, 2)
 
 class projectile(object):
 	def __init__(self, x, y, radius, color, facing):
@@ -91,6 +98,8 @@ class enemy(object):
 		self.path = [self.x, self.end] # Track where we're starting and ending
 		self.walkCount = 0 # For knowing which image we're on
 		self.vel = 3
+
+		self.hitbox = (self.x + 17, self.y + 2, 31, 57)
 	
 	def draw(self, win):
 		self.move()
@@ -102,6 +111,10 @@ class enemy(object):
 		else: # Moving left
 			win.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
 			self.walkCount += 1
+		
+		# Draw the characters hitbox, for testing
+		self.hitbox = (self.x + 17, self.y + 2, 31, 57) # Update the hitbox's location
+		pygame.draw.rect(win, (255, 0, 0,), self.hitbox, 2)
 	
 	# Just going to move side to side
 	def move(self):
@@ -117,6 +130,9 @@ class enemy(object):
 			else:
 				self.vel *= -1
 				self.walkCount = 0
+	
+	def hit(self):
+		print('hit')
 
 
 def redrawGameWindow():
@@ -146,6 +162,9 @@ e1 = enemy(width = characterWidth,
 	end = screenWidth - 150)
 projectiles = []
 run = True
+
+# For making each press of the spacebar cause only one shot
+space_up = True
 while run:
 	# Give loop a time delay - like a clock in the game
 	clock.tick(fps) # Set to 27 FPS
@@ -156,6 +175,15 @@ while run:
 			run = False
 
 	for ammo in projectiles:
+		# Collision checking
+		# if above the bottom of the hitbox, AND below the top of the hitbox...
+		if ammo.y - ammo.radius < e1.hitbox[1] + e1.hitbox[3] and ammo.y + ammo.radius > e1.hitbox[1]:
+			# ...and if between the right side of the hitbox AND the left side of the hitbox...
+			if ammo.x - ammo.radius < e1.hitbox[0] + e1.hitbox[2] and ammo.x + ammo.radius > e1.hitbox[0]:
+				# ...then the ammo is totally in the hitbox, and we have collision
+				e1.hit()
+				projectiles.pop(projectiles.index(ammo))
+
 		# If ammo is on the screen
 		if ammo.x < screenWidth and ammo.x > 0:
 			ammo.x += ammo.vel # Move the ammo
@@ -167,16 +195,20 @@ while run:
 	# - Can put all of the pressed keys into a list -> going to do this:
 	keys = pygame.key.get_pressed()
 
-	if keys[pygame.K_SPACE]:
-		if len(projectiles) < 5: # Change this to limit the amount of projectiles that can be on the screen
-			if p1.left:
-				facing = -1
-			else:
-				facing = 1
-			# Make sure the ammo is coming from the middle of the man
-			# Setting radius to 5 and color to black (RGB)
-			projectiles.append(projectile(round(p1.x + p1.width // 2), round(p1.y + p1.height // 2), 5, (0, 0, 0,), facing))
-
+	# Ammo
+	if keys[pygame.K_SPACE] and space_up:
+		space_up = False
+		if p1.left:
+			facing = -1
+		else:
+			facing = 1
+		# Make sure the ammo is coming from the middle of the man
+		# Setting radius to 5 and color to black (RGB)
+		projectiles.append(projectile(round(p1.x + p1.width // 2), round(p1.y + p1.height // 2), 5, (0, 0, 0,), facing))
+	# If the spacebar has been released, flip this boolean so that another ammo can be shot
+	if not keys[pygame.K_SPACE]:
+		space_up = True
+	
 	# -------Move the character---------
 	# (Grid (0,0) is top left, bottom right is (max, max))
 	# Left arrow key and don't want them to move off the screen
