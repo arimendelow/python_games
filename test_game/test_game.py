@@ -20,6 +20,7 @@ characterHeight = 64
 # Colors used throughout
 black = (0, 0, 0,)
 red = (255, 0, 0,)
+green = (0, 128, 0)
 
 # Track score
 score = 0
@@ -76,9 +77,9 @@ class player(object):
 			else:
 				win.blit(self.walkLeft[0], (self.x, self.y)) # Show first image in walkLeft array
 		
-		# Draw the characters hitbox, for testing
 		self.hitbox = (self.x + 20, self.y + 12, 22, 50) # Update the hitbox's location
-		pygame.draw.rect(win, red, self.hitbox, 2)
+		# Draw the characters hitbox, for testing
+		# pygame.draw.rect(win, red, self.hitbox, 2)
 
 class projectile(object):
 	def __init__(self, x, y, radius, color, facing):
@@ -109,9 +110,15 @@ class enemy(object):
 		self.vel = 3
 
 		self.hitbox = (self.x + 17, self.y + 2, 31, 57)
+
+		self.maxHealth = 10
+		self.health = self.maxHealth
+		# self.visible = True # Once his health is done, we're going to get rid of him
 	
 	def draw(self, win):
 		self.move()
+		# Only draw him if he's alive (visible)
+		# if self.visible:
 		if self.walkCount + 1 >= 33: # 33 because 11 images
 			self.walkCount = 0
 		if self.vel > 0: # Moving right
@@ -120,11 +127,19 @@ class enemy(object):
 		else: # Moving left
 			win.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
 			self.walkCount += 1
-		
-		# Draw the characters hitbox, for testing
-		self.hitbox = (self.x + 17, self.y + 2, 31, 57) # Update the hitbox's location
-		pygame.draw.rect(win, (255, 0, 0,), self.hitbox, 2)
 	
+		# Draw the health bar
+		# Make the hitbox 20 over the character, 50 wide, and 10 high
+		barWidth = 50
+		barHeight = 10
+		barOffset = 20
+		pygame.draw.rect(win, red, (self.hitbox[0], self.hitbox[1] - barOffset, barWidth, barHeight))
+		pygame.draw.rect(win, green, (self.hitbox[0], self.hitbox[1] - barOffset, barWidth - ((barWidth/self.maxHealth) * (self.maxHealth -  self.health)), barHeight))
+
+		self.hitbox = (self.x + 17, self.y + 2, 31, 57) # Update the hitbox's location
+		# Draw the characters hitbox, for testing
+		# pygame.draw.rect(win, (255, 0, 0,), self.hitbox, 2)
+		
 	# Just going to move side to side
 	def move(self):
 		if self.vel > 0: # If moving to the right
@@ -141,7 +156,10 @@ class enemy(object):
 				self.walkCount = 0
 	
 	def hit(self):
-		print('hit')
+		if self.health > 0:
+			self.health -= 1
+		# else:
+		# 	self.visible = False
 
 
 def redrawGameWindow():
@@ -154,7 +172,8 @@ def redrawGameWindow():
 
 	# Draw the characters
 	p1.draw(win)
-	e1.draw(win)
+	for enemy in enemies:
+		enemy.draw(win)
 
 	# Draw the projectiles
 	for ammo in projectiles:
@@ -164,16 +183,21 @@ def redrawGameWindow():
 	pygame.display.update()
 
 # Main loop
+projectiles = []
+enemies = []
+
 p1 = player(width = characterWidth,
 	height = characterHeight,
 	x = screenWidth // 2,
 	y = screenHeight -  characterWidth - 10) # -10 to put it 10px above the bottom
-e1 = enemy(width = characterWidth,
+
+enemies.append(
+	enemy(width = characterWidth,
 	height = characterHeight,
 	x = 150,
 	y = screenHeight -  characterWidth - 10,
-	end = screenWidth - 150)
-projectiles = []
+	end = screenWidth - 150))
+
 # For making each press of the spacebar cause only one shot
 space_up = True
 # For score displaying
@@ -191,14 +215,18 @@ while run:
 
 	for ammo in projectiles:
 		# Collision checking
-		# if above the bottom of the hitbox, AND below the top of the hitbox...
-		if ammo.y - ammo.radius < e1.hitbox[1] + e1.hitbox[3] and ammo.y + ammo.radius > e1.hitbox[1]:
-			# ...and if between the right side of the hitbox AND the left side of the hitbox...
-			if ammo.x - ammo.radius < e1.hitbox[0] + e1.hitbox[2] and ammo.x + ammo.radius > e1.hitbox[0]:
-				# ...then the ammo is totally in the hitbox, and we have collision
-				e1.hit()
-				score += 1
-				projectiles.pop(projectiles.index(ammo))
+		for enemy in enemies:
+			# if above the bottom of the hitbox, AND below the top of the hitbox...
+			if ammo.y - ammo.radius < enemy.hitbox[1] + enemy.hitbox[3] and ammo.y + ammo.radius > enemy.hitbox[1]:
+				# ...and if between the right side of the hitbox AND the left side of the hitbox...
+				if ammo.x - ammo.radius < enemy.hitbox[0] + enemy.hitbox[2] and ammo.x + ammo.radius > enemy.hitbox[0]:
+					# ...then the ammo is totally in the hitbox, and we have collision
+					enemy.hit()
+					score += 1
+					projectiles.pop(projectiles.index(ammo))
+					# If the enemy is dead, pop em
+					if enemy.health == 0:
+						enemies.pop(enemies.index(enemy))
 
 		# If ammo is on the screen
 		if ammo.x < screenWidth and ammo.x > 0:
