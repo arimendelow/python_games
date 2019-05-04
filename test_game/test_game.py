@@ -56,6 +56,9 @@ class player(object):
 
 		# Hitbox, for collision
 		self.hitbox = (self.x + 20, self.y + 12, 22, 50)
+
+		# Penalty, when hit
+		self.penalty = 5
 	
 	def draw(self, win):
 		# If walkCount goes over 27 (fps), we'll run out of sprites
@@ -80,6 +83,24 @@ class player(object):
 		self.hitbox = (self.x + 20, self.y + 12, 22, 50) # Update the hitbox's location
 		# Draw the characters hitbox, for testing
 		# pygame.draw.rect(win, red, self.hitbox, 2)
+	
+	def hit(self):
+		# Reset location
+		self.x = screenWidth // 2
+		self.y = screenHeight -  characterHeight - 10
+		self.walkCount = 0
+		font1 = pygame.font.Font('pixelmix_bold.ttf', 50) # Size 30
+		text = font1.render(f"You lose!", 1, red)
+		win.blit(text, (screenWidth // 2 - text.get_width() // 2, screenHeight // 2 - text.get_height()))
+		pygame.display.update()
+
+		# Freeze the game for a moment, but allow the user to still quit
+		for x in range(100):
+			pygame.time.delay(10)
+			for event in pygame.event.get():
+				if event.type == pygame.quit:
+					x = 100 * 10 + 1 # Skip to the end of the counter
+					pygame.quit()
 
 class projectile(object):
 	def __init__(self, x, y, radius, color, facing):
@@ -161,7 +182,6 @@ class enemy(object):
 		# else:
 		# 	self.visible = False
 
-
 def redrawGameWindow():
 	# Put the BG pic
 	win.blit(bg, (0,0))
@@ -189,14 +209,17 @@ enemies = []
 p1 = player(width = characterWidth,
 	height = characterHeight,
 	x = screenWidth // 2,
-	y = screenHeight -  characterWidth - 10) # -10 to put it 10px above the bottom
+	y = screenHeight - characterHeight - 10) # -10 to put it 10px above the bottom
 
-enemies.append(
-	enemy(width = characterWidth,
-	height = characterHeight,
-	x = 150,
-	y = screenHeight -  characterWidth - 10,
-	end = screenWidth - 150))
+def newEnemy():
+	enemies.append(
+		enemy(width = characterWidth,
+		height = characterHeight,
+		x = 0,
+		y = screenHeight -  characterHeight - 10,
+		end = screenWidth - 200))
+
+newEnemy()
 
 # For making each press of the spacebar cause only one shot
 space_up = True
@@ -213,20 +236,39 @@ while run:
 		if event.type == pygame.QUIT: # If the exit button is pressed
 			run = False
 
+	# Collision checking between enemy and player
+	# Named it 'e' instead of 'enemy' because the object is already called 'enemy'
+	for e in enemies:
+		# If the y range of the e overlaps with that of the player...
+		if e.hitbox[1] < p1.hitbox[3] + p1.hitbox[1] and e.hitbox[1] + e.hitbox[3] > p1.hitbox[1]:
+			# ... AND if the x range of the e overlaps with that of the player
+			if e.hitbox[0] < p1.hitbox[0] + p1.hitbox[2] and e.hitbox[0] + e.hitbox[2] > p1.hitbox[0]:
+				p1.hit()
+				# Reset game
+				score = 0
+
+				# In case of jumping while death
+				p1.isJump = False
+				p1.jumpCount = p1.jumpHeight
+
+				enemies.pop(enemies.index(e))
+				newEnemy()
+
+	# Collision checking between ammo and enemy
 	for ammo in projectiles:
-		# Collision checking
-		for enemy in enemies:
+		for e in enemies:
 			# if above the bottom of the hitbox, AND below the top of the hitbox...
-			if ammo.y - ammo.radius < enemy.hitbox[1] + enemy.hitbox[3] and ammo.y + ammo.radius > enemy.hitbox[1]:
+			if ammo.y - ammo.radius < e.hitbox[1] + e.hitbox[3] and ammo.y + ammo.radius > e.hitbox[1]:
 				# ...and if between the right side of the hitbox AND the left side of the hitbox...
-				if ammo.x - ammo.radius < enemy.hitbox[0] + enemy.hitbox[2] and ammo.x + ammo.radius > enemy.hitbox[0]:
+				if ammo.x - ammo.radius < e.hitbox[0] + e.hitbox[2] and ammo.x + ammo.radius > e.hitbox[0]:
 					# ...then the ammo is totally in the hitbox, and we have collision
-					enemy.hit()
+					e.hit()
 					score += 1
 					projectiles.pop(projectiles.index(ammo))
-					# If the enemy is dead, pop em
-					if enemy.health == 0:
-						enemies.pop(enemies.index(enemy))
+					# If the enemy is dead, pop em and make a new one
+					if e.health == 0:
+						enemies.pop(enemies.index(e))
+						newEnemy()
 
 		# If ammo is on the screen
 		if ammo.x < screenWidth and ammo.x > 0:
@@ -276,8 +318,6 @@ while run:
 		if keys[pygame.K_UP]:
 			p1.isJump = True
 			# Not moving side to side
-			p1.right = False
-			p1.left = False
 			p1.walkCount = 0
 	else:
 		if p1.jumpCount >= -p1.jumpHeight:
