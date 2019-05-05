@@ -16,6 +16,12 @@ red = (255, 0, 0,)
 green = (0, 255, 0)
 blue = (0, 0, 255)
 
+# Colors of the different elements
+bgColor = black
+headColor = green
+bodyColor = red
+textColor = white
+
 # Make our window - this is what we'll draw on
 screenWidth = 640
 screenHeight = 480
@@ -23,20 +29,20 @@ win = pygame.display.set_mode((screenWidth, screenHeight)) # Giving it a touple 
 pygame.display.set_caption("Snake") # Give the window a title
 bg = pygame.Surface(win.get_size())
 bg = bg.convert()
-bg.fill(black)
+bg.fill(bgColor)
 
 # Track score
 score = 0
 highScore = 0
 
 # For displaying text
-def displayTextCenterAlign(fontSize, text, x, y, color = white):
+def displayTextCenterAlign(fontSize, text, x, y, color = textColor):
 	font = pygame.font.Font('snake/pixelmix_bold.ttf', fontSize)
 	text = font.render(text, True, color)
 	textRect = text.get_rect()
 	textRect.center = (x, y)
 	win.blit(text, textRect)
-def displayTextLeftAlign(fontSize, text, x, y, color = white):
+def displayTextLeftAlign(fontSize, text, x, y, color = textColor):
 	font = pygame.font.Font('snake/pixelmix_bold.ttf', fontSize)
 	text = font.render(text, True, color)
 	win.blit(text, (x, y))
@@ -74,7 +80,7 @@ def redrawGameWindow():
 	# Background
 	win.blit(bg, (0,0))
 
-	displayTextLeftAlign(10, f"Score: {score}", 10, 10, white)
+	displayTextLeftAlign(10, f"Score: {score}", 10, 10, textColor)
 
 	# Draw any characters here
 	for link in snake:
@@ -102,21 +108,21 @@ def waitForStart():
 				gameOver()
 
 def homePage():
-	win.fill(black)
-	displayTextCenterAlign(45, "Welcome to Snake!", screenWidth // 2, screenHeight // 3, white)
-	displayTextCenterAlign(20, "press any key to begin", screenWidth // 2, screenHeight // 2, white)
-	displayTextCenterAlign(15, "(Controls: Arrow Keys)", screenWidth // 2, screenHeight // 2 + 20, white)
-	displayTextCenterAlign(10, "by Ari Mendelow", screenWidth // 2, screenHeight - 10, white)
+	win.fill(bgColor)
+	displayTextCenterAlign(45, "Welcome to Snake!", screenWidth // 2, screenHeight // 3, textColor)
+	displayTextCenterAlign(20, "press any key to begin", screenWidth // 2, screenHeight // 2, textColor)
+	displayTextCenterAlign(15, "(Controls: Arrow Keys)", screenWidth // 2, screenHeight // 2 + 20, textColor)
+	displayTextCenterAlign(10, "by Ari Mendelow", screenWidth // 2, screenHeight - 10, textColor)
 	pygame.display.update()
 	waitForStart()
 
 def gameOver():
-	win.fill(black)
-	displayTextCenterAlign(45, "You lose!!", screenWidth // 2, screenHeight // 3, white)
-	displayTextCenterAlign(30, f"Last score: {score}, high score: {highScore}", screenWidth // 2, screenHeight // 3 + 50, white)
-	displayTextCenterAlign(20, "press any key to restart", screenWidth // 2, screenHeight // 2, white)
-	displayTextCenterAlign(15, "(Controls: Arrow Keys)", screenWidth // 2, screenHeight // 2 + 20, white)
-	displayTextCenterAlign(10, "by Ari Mendelow", screenWidth // 2, screenHeight - 10, white)
+	win.fill(bgColor)
+	displayTextCenterAlign(45, "You lose!!", screenWidth // 2, screenHeight // 3, textColor)
+	displayTextCenterAlign(30, f"Last score: {score}, high score: {highScore}", screenWidth // 2, screenHeight // 3 + 50, textColor)
+	displayTextCenterAlign(20, "press any key to restart", screenWidth // 2, screenHeight // 2, textColor)
+	displayTextCenterAlign(15, "(Controls: Arrow Keys)", screenWidth // 2, screenHeight // 2 + 20, textColor)
+	displayTextCenterAlign(10, "by Ari Mendelow", screenWidth // 2, screenHeight - 10, textColor)
 	pygame.display.update()
 	pygame.time.delay(200)
 	waitForStart()
@@ -144,7 +150,7 @@ def playGame():
 				height = linkHeight,
 				x = x,
 				y = y,
-				color = red
+				color = headColor
 			)
 		)
 	
@@ -203,7 +209,7 @@ def playGame():
 			direction = "down" if down and direction != "up" else direction
 
 		snakeHead = snake[0]
-		snakeHead.color = green
+		snakeHead.color = bodyColor # Makes the body of the snake this color
 		# Check collisions between the head and the rest of the body
 		for link in snake[2:]:
 			# Check y overlap
@@ -212,7 +218,6 @@ def playGame():
 				if snakeHead.hitbox[0] < link.hitbox[0] + link.hitbox[2] and snakeHead.hitbox[0] + snakeHead.hitbox[2] > link.hitbox[0]:
 					# Overlap
 					return # end the game
-
 
 		if direction == "left":
 			direction = "left"
