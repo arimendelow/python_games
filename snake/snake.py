@@ -3,11 +3,14 @@ import random
 pygame.init() # Always need to do this
 
 # Control the size of the elements
-foodWidth, foodHeight = 10, 10
-linkWidth, linkHeight = 20, 20
+foodWidth, foodHeight = 5, 5
+linkWidth, linkHeight = 10, 10
 
 # Control the delay of the game - higher numbers means the game moves slower
 gameDelay = 0
+
+# Allow us to change our FPS
+clock = pygame.time.Clock()
 
 # Commonly used colors
 black = (0, 0, 0,)
@@ -179,6 +182,7 @@ def playGame():
 		justAte = False
 		# Control the speed of the game - speed it up as the snake gets longer
 		pygame.time.delay(gameDelay)
+		clock.tick(30) # Pygame will never show more than 30 frames/second
 
 		# Check for events - anything that happens from the user
 		for event in pygame.event.get():
