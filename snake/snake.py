@@ -2,8 +2,12 @@ import pygame
 import random
 pygame.init() # Always need to do this
 
-foodWidth, foodHeight = 5, 5
-linkWidth, linkHeight = 10, 10
+# Control the size of the elements
+foodWidth, foodHeight = 10, 10
+linkWidth, linkHeight = 20, 20
+
+# Control the delay of the game - higher numbers means the game moves slower
+gameDelay = 0
 
 # Commonly used colors
 black = (0, 0, 0,)
@@ -27,13 +31,13 @@ highScore = 0
 
 # For displaying text
 def displayTextCenterAlign(fontSize, text, x, y, color = white):
-	font = pygame.font.Font('pixelmix_bold.ttf', fontSize)
+	font = pygame.font.Font('snake/pixelmix_bold.ttf', fontSize)
 	text = font.render(text, True, color)
 	textRect = text.get_rect()
 	textRect.center = (x, y)
 	win.blit(text, textRect)
 def displayTextLeftAlign(fontSize, text, x, y, color = white):
-	font = pygame.font.Font('pixelmix_bold.ttf', fontSize)
+	font = pygame.font.Font('snake/pixelmix_bold.ttf', fontSize)
 	text = font.render(text, True, color)
 	win.blit(text, (x, y))
 
@@ -90,9 +94,9 @@ def waitForStart():
 				pygame.quit()
 				exit()
 			if event.type == pygame.KEYUP:
-				playGame()
 				snake = []
-				food = []
+				foods = []
+				playGame()
 				gameOver()
 
 def homePage():
@@ -166,7 +170,7 @@ def playGame():
 		
 		justAte = False
 		# Control the speed of the game - speed it up as the snake gets longer
-		# pygame.time.delay(1000)
+		pygame.time.delay(gameDelay)
 
 		# Check for events - anything that happens from the user
 		for event in pygame.event.get():
@@ -195,6 +199,7 @@ def playGame():
 			direction = "down" if down and direction != "up" else direction
 
 		snakeHead = snake[0]
+		snakeHead.color = green
 		# Check collisions between the head and the rest of the body
 		for link in snake[2:]:
 			# Check y overlap
