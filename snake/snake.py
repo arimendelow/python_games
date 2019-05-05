@@ -220,6 +220,7 @@ def playGame():
 		
 		if direction == "up":
 			direction = "up"
+			# If going off the top of the screen
 			if snakeHead.y <= 0:
 				y = screenHeight - linkHeight
 			else:
@@ -229,8 +230,9 @@ def playGame():
 				y = y
 			)
 
-		if direction == "down" and snakeHead.y < screenHeight - snakeHead.height - linkHeight:
+		if direction == "down":
 			direction = "down"
+			# If going off the bottom of the screen
 			if snakeHead.y + linkHeight >= screenHeight:
 				y = 0
 			else:
