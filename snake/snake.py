@@ -2,6 +2,9 @@ import pygame
 import random
 pygame.init() # Always need to do this
 
+foodWidth, foodHeight = 5, 5
+linkWidth, linkHeight = 10, 10
+
 # Commonly used colors
 black = (0, 0, 0,)
 white = (255, 255, 255)
@@ -78,6 +81,8 @@ def redrawGameWindow():
 	pygame.display.update()
 
 def waitForStart():
+	global snake
+	global foods
 	waiting = True
 	while waiting:
 		for event in pygame.event.get():
@@ -86,9 +91,7 @@ def waitForStart():
 				exit()
 			if event.type == pygame.KEYUP:
 				playGame()
-				global snake
 				snake = []
-				global foods
 				food = []
 				gameOver()
 
@@ -119,7 +122,6 @@ snake = []
 foods = []
 def playGame():
 	# Make the characters
-	linkWidth, linkHeight = 10, 10
 
 	global snake
 	global score
@@ -140,14 +142,12 @@ def playGame():
 		)
 	
 	def generateSnakeFood():
-		width = 5
-		height = 5
 		foods.append(
 			snakeFood(
-				width = width,
-				height = height,
-				x = random.randint(width, screenWidth - width),
-				y = random.randint(height, screenHeight - height)
+				width = foodWidth,
+				height = foodHeight,
+				x = random.randint(foodWidth, screenWidth - foodWidth),
+				y = random.randint(foodHeight, screenHeight - foodHeight)
 			)
 		)
 
@@ -166,7 +166,7 @@ def playGame():
 		
 		justAte = False
 		# Control the speed of the game - speed it up as the snake gets longer
-		# pygame.time.delay(100)
+		# pygame.time.delay(1000)
 
 		# Check for events - anything that happens from the user
 		for event in pygame.event.get():
