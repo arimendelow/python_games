@@ -23,12 +23,16 @@ score = 0
 highScore = 0
 
 # For displaying text
-def displayText(fontSize, text, x, y, color = white):
-	font = pygame.font.Font('snake/pixelmix_bold.ttf', fontSize)
+def displayTextCenterAlign(fontSize, text, x, y, color = white):
+	font = pygame.font.Font('pixelmix_bold.ttf', fontSize)
 	text = font.render(text, True, color)
 	textRect = text.get_rect()
 	textRect.center = (x, y)
 	win.blit(text, textRect)
+def displayTextLeftAlign(fontSize, text, x, y, color = white):
+	font = pygame.font.Font('pixelmix_bold.ttf', fontSize)
+	text = font.render(text, True, color)
+	win.blit(text, (x, y))
 
 class snakeLink(object):
 	# For if character is a square
@@ -61,9 +65,7 @@ def redrawGameWindow():
 	# Background
 	win.blit(bg, (0,0))
 
-	# Update any text - here, score
-	# text = font.render('Score:' + str(score), 1, black)
-	# win.blit(text, (10, 10))
+	displayTextLeftAlign(10, f"Score: {score}", 10, 10, white)
 
 	# Draw any characters here
 	for link in snake:
@@ -84,23 +86,30 @@ def waitForStart():
 				exit()
 			if event.type == pygame.KEYUP:
 				playGame()
+				global snake
+				snake = []
+				global foods
+				food = []
+				gameOver()
 
 def homePage():
 	win.fill(black)
-	displayText(45, "Welcome to Snake!", screenWidth // 2, screenHeight // 3, white)
-	displayText(20, "press any key to begin", screenWidth // 2, screenHeight // 2, white)
-	displayText(15, "(Controls: Arrow Keys)", screenWidth // 2, screenHeight // 2 + 20, white)
-	displayText(10, "by Ari Mendelow", screenWidth // 2, screenHeight - 10, white)
+	displayTextCenterAlign(45, "Welcome to Snake!", screenWidth // 2, screenHeight // 3, white)
+	displayTextCenterAlign(20, "press any key to begin", screenWidth // 2, screenHeight // 2, white)
+	displayTextCenterAlign(15, "(Controls: Arrow Keys)", screenWidth // 2, screenHeight // 2 + 20, white)
+	displayTextCenterAlign(10, "by Ari Mendelow", screenWidth // 2, screenHeight - 10, white)
 	pygame.display.update()
 	waitForStart()
 
 def gameOver():
 	win.fill(black)
-	displayText(45, "You lose!!", screenWidth // 2, screenHeight // 3, white)
-	displayText(20, "press any key to begin", screenWidth // 2, screenHeight // 2, white)
-	displayText(15, "(Controls: Arrow Keys)", screenWidth // 2, screenHeight // 2 + 20, white)
-	displayText(10, "by Ari Mendelow", screenWidth // 2, screenHeight - 10, white)
+	displayTextCenterAlign(45, "You lose!!", screenWidth // 2, screenHeight // 3, white)
+	displayTextCenterAlign(30, f"Last score: {score}, high score: {highScore}", screenWidth // 2, screenHeight // 3 + 50, white)
+	displayTextCenterAlign(20, "press any key to restart", screenWidth // 2, screenHeight // 2, white)
+	displayTextCenterAlign(15, "(Controls: Arrow Keys)", screenWidth // 2, screenHeight // 2 + 20, white)
+	displayTextCenterAlign(10, "by Ari Mendelow", screenWidth // 2, screenHeight - 10, white)
 	pygame.display.update()
+	pygame.time.delay(200)
 	waitForStart()
 
 	
@@ -193,7 +202,9 @@ def playGame():
 				# Check x overlap
 				if snakeHead.hitbox[0] < link.hitbox[0] + link.hitbox[2] and snakeHead.hitbox[0] + snakeHead.hitbox[2] > link.hitbox[0]:
 					# Overlap
-					gameOver()
+					return # end the game
+
+
 		if direction == "left":
 			direction = "left"
 			# If going off the left of the screen
