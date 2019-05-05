@@ -126,9 +126,7 @@ def gameOver():
 	pygame.display.update()
 	pygame.time.delay(200)
 	waitForStart()
-
 	
-
 # ------------------ Main loop ------------------
 snake = []
 foods = []
