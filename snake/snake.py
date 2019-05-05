@@ -43,30 +43,32 @@ def displayTextLeftAlign(fontSize, text, x, y, color = white):
 
 class snakeLink(object):
 	# For if character is a square
-	def __init__(self, width, height, x, y):
+	def __init__(self, width, height, x, y, color):
 		self.width = width
 		self.height = height
 		self.x = x
 		self.y = y
 		self.hitbox = (self.x, self.y, self.width, self.height)
+		self.color = color
 
 	def draw(self, win):
 		self.hitbox = (self.x, self.y, self.width, self.height)
 		# Draw the hitbox
-		pygame.draw.rect(win, red, self.hitbox)
+		pygame.draw.rect(win, self.color, self.hitbox)
 
 class snakeFood(object):
-	def __init__(self, width, height, x, y):
+	def __init__(self, width, height, x, y, color):
 		self.width = width
 		self.height = height
 		self.x = x
 		self.y = y
 		self.hitbox = (self.x, self.y, self.width, self.height)
+		self.color = color
 
 	def draw(self, win):
 		self.hitbox = (self.x, self.y, self.width, self.height)
 		# Draw the hitbox
-		pygame.draw.rect(win, white, self.hitbox)
+		pygame.draw.rect(win, self.color, self.hitbox)
 
 def redrawGameWindow():
 	# Background
@@ -141,7 +143,8 @@ def playGame():
 				width = linkWidth,
 				height = linkHeight,
 				x = x,
-				y = y
+				y = y,
+				color = red
 			)
 		)
 	
@@ -151,7 +154,8 @@ def playGame():
 				width = foodWidth,
 				height = foodHeight,
 				x = random.randint(foodWidth, screenWidth - foodWidth),
-				y = random.randint(foodHeight, screenHeight - foodHeight)
+				y = random.randint(foodHeight, screenHeight - foodHeight),
+				color = white
 			)
 		)
 
