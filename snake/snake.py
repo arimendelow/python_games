@@ -99,6 +99,7 @@ def redrawGameWindow():
 def waitForStart():
 	global snake
 	global foods
+	global score
 	waiting = True
 	while waiting:
 		for event in pygame.event.get():
@@ -108,6 +109,7 @@ def waitForStart():
 			if event.type == pygame.KEYUP:
 				snake = []
 				foods = []
+				score = 0
 				playGame()
 				gameOver()
 
