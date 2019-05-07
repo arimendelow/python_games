@@ -3,7 +3,7 @@ import random
 pygame.init() # Always need to do this
 
 # Control the size of the elements
-foodWidth, foodHeight = 5, 5
+foodWidth, foodHeight = 8, 8
 linkWidth, linkHeight = 10, 10
 
 # Control the delay of the game - higher numbers means the game moves slower
@@ -83,7 +83,8 @@ def redrawGameWindow():
 	# Background
 	win.blit(bg, (0,0))
 
-	displayTextLeftAlign(10, f"Score: {score}", 10, 10, textColor)
+	displayTextLeftAlign(20, f"Score: {score}", 10, 10, textColor)
+	displayTextLeftAlign(15, f"High score: {highScore}", 10, 40, textColor)
 
 	# Draw any characters here
 	for link in snake:
