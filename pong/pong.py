@@ -12,7 +12,7 @@ ballRad = 8
 
 # Controls the speed of the elements
 paddleVel = 20
-obstVel = 20
+ballVel = 20
 
 # Allow us to set our FPS
 clock = pygame.time.Clock()
@@ -52,7 +52,7 @@ DOWN = 3
 # Global variables
 player = object
 opponent = object
-ball = []
+ball = object
 
 # For displaying text
 def displayTextCenterAlign(fontSize, text, x, y, color = textColor):
@@ -66,27 +66,28 @@ def displayTextLeftAlign(fontSize, text, x, y, color = textColor):
 	text = font.render(text, True, color)
 	win.blit(text, (x, y))
 
-class circle(object):
-	# For if character is a square
-	def __init__(self, radius = ballRad, x = screenWidth // 2, y = screenHeight // 2, color = ballColor, vel = 0, dir = LEFT):
-		self.radius = radius
-		self.x = x
-		self.y = y
-		self.color = color
-		self.vel = vel
-		self.dir = dir
+# class circle(object):
+# 	# For if character is a square
+# 	def __init__(self, radius = ballRad, x = screenWidth // 2, y = screenHeight // 2, color = ballColor, xvel = 0, dir = LEFT):
+# 		self.radius = radius
+# 		self.x = x
+# 		self.y = y
+# 		self.color = color
+# 		self.vel = vel
+# 		self.dir = dir
 
-	def draw(self, win):
-		# Draw the circle
-		pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
+# 	def draw(self, win):
+# 		# Draw the circle
+# 		pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
 class rectangle(object):
-	def __init__(self, width, height, x, y, vel, color):
+	def __init__(self, width, height, x, y, xVel = 0, yVel = 0, color = white):
 		self.width = width
 		self.height = height
 		self.x = x
 		self.y = y
-		self.vel = vel
+		self.xVel = xVel
+		self.yVel = yVel
 		self.hitbox = (self.x, self.y, self.width, self.height)
 		self.color = color
 
@@ -106,8 +107,7 @@ def redrawGameWindow():
 		# Player
 	player.draw(win)
 		# Objectives
-	for b in ball:
-		b.draw(win)
+	ball.draw(win)
 	
 	# Need to refresh the window to show any s, ie draws
 	pygame.display.update()
@@ -130,11 +130,20 @@ def waitForStart():
 					height = paddleHeight,
 					x = 0,
 					y = screenHeight // 2 - paddleHeight // 2,
-					vel = paddleVel,
+					yVel = paddleVel,
 					color = paddleColor
 				)
 				# Generate our first ball
-				ball.append(circle())
+				ball = rectangle(
+					width = ballRad,
+					height = ballRad,
+					x = screenWidth // 2,
+					y = screenHeight // 2,
+					xVel = 0,
+					yVel = - ballVel,
+					color = ballColor
+
+				)
 				# Generate our opponent
 				# todo
 				score = 0
@@ -197,7 +206,14 @@ def playGame():
 		if keys[pygame.K_DOWN] and player.y < screenHeight - player.height - player.vel:
 			player.y += player.vel
 
+		# Bounce the ball
+		# Off the walls
+		#todo
 
+		# Off the paddle
+		# First of all, did it hit the user's paddle (which, remember, is on the left AKA y = 0)
+			# Hit! Now, bounce.
+			
 
 		redrawGameWindow()
 
