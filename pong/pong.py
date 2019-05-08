@@ -10,6 +10,9 @@ paddleWidth = 20
 paddleHeight = 100
 ballRad = 16
 
+# What is the maximum angle (in degrees) of reflection from the paddle?
+maxAngle = 45
+
 # Controls the speed of the elements - in px/s
 paddleVel = 10
 ballVel = 10
@@ -17,7 +20,7 @@ ballVel = 10
 # Allow us to set our FPS
 clock = pygame.time.Clock()
 # redraws per second
-RPS = 10
+RPS = 20
 
 # Commonly used colors
 black = (0, 0, 0,)
@@ -219,7 +222,15 @@ def playGame():
 		if ball.x <= player.x + player.width and ball.x + ball.width > player.x:
 			if ball.y < player.y + player.height and ball.y + ball.height > player.y:
 				# Hit! Now, bounce.
-				ball.xVel *= -1
+				# How far is the ball from the center of the paddle?
+				ballCenter = ball.y + ballRad // 2
+				paddleCenter = player.y + paddleHeight // 2
+				ballDelta = ballCenter - paddleCenter # Negative if the ball is on the higher half of the paddle
+				# Scale this delta into angle of reflection, from 0 to ±maxAngle°
+				ballAngle = ballDelta * maxAngle / (paddleHeight / 2)
+				# Now, break up the ball velocity into its x and y components according to this angle
+				ball.xVel = abs(math.cos(ballAngle) * ballVel) # abs cuz it needs to be moving right after the bounce
+				ball.yVel = math.cos(ballAngle) * ballVel
 		
 		# Move the ball - rather than controlling the direction of the ball here,
 		# the xVel and yVel are made positive or negative by the code handling bouncing
