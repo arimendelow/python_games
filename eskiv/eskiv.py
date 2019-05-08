@@ -3,6 +3,8 @@ import random
 import math
 pygame.init() # Always need to do this
 
+gameName = "Eskiv"
+
 # Control the size of the elements
 playerRad = 8
 objRad = 8
@@ -11,9 +13,6 @@ obstRad = 5
 # Controls the speed of the elements
 playerVel = 12
 obstVel = 10
-
-# Control the delay of the game - higher numbers means the game moves slower
-gameDelay = 0
 
 # Allow us to set our FPS
 clock = pygame.time.Clock()
@@ -36,7 +35,7 @@ textColor = white
 screenWidth = 640
 screenHeight = 480
 win = pygame.display.set_mode((screenWidth, screenHeight)) # Giving it a touple with the size of the window
-pygame.display.set_caption("Eskiv") # Give the window a title
+pygame.display.set_caption(gameName) # Give the window a title
 bg = pygame.Surface(win.get_size())
 bg = bg.convert()
 bg.fill(bgColor)
@@ -58,13 +57,13 @@ obsts = []
 
 # For displaying text
 def displayTextCenterAlign(fontSize, text, x, y, color = textColor):
-	font = pygame.font.Font('snake/pixelmix_bold.ttf', fontSize)
+	font = pygame.font.Font(f"{gameName}/pixelmix_bold.ttf", fontSize)
 	text = font.render(text, True, color)
 	textRect = text.get_rect()
 	textRect.center = (x, y)
 	win.blit(text, textRect)
 def displayTextLeftAlign(fontSize, text, x, y, color = textColor):
-	font = pygame.font.Font('snake/pixelmix_bold.ttf', fontSize)
+	font = pygame.font.Font(f"{gameName}/pixelmix_bold.ttf", fontSize)
 	text = font.render(text, True, color)
 	win.blit(text, (x, y))
 
@@ -124,7 +123,7 @@ def waitForStart():
 
 def homePage():
 	win.fill(bgColor)
-	displayTextCenterAlign(45, "Welcome to Eskiv!", screenWidth // 2, screenHeight // 3, textColor)
+	displayTextCenterAlign(45, f"Welcome to {gameName}!", screenWidth // 2, screenHeight // 3, textColor)
 	displayTextCenterAlign(20, "press any key to begin", screenWidth // 2, screenHeight // 2, textColor)
 	displayTextCenterAlign(15, "(Controls: Arrow Keys)", screenWidth // 2, screenHeight // 2 + 20, textColor)
 	displayTextCenterAlign(10, "by Ari Mendelow", screenWidth // 2, screenHeight - 10, textColor)
@@ -183,9 +182,7 @@ def playGame():
 
 	run = True
 	while run:
-		
-		# Control the speed of the game - speed it up as the snake gets longer
-		pygame.time.delay(gameDelay)
+
 		clock.tick(30) # Pygame will never show more than 30 frames/second
 
 		# Check for events - anything that happens from the user
@@ -234,7 +231,7 @@ def playGame():
 		if keys[pygame.K_UP] and player.y > player.vel:
 			player.y -= player.vel
 		
-		if keys[pygame.K_DOWN] and player.y < screenHeight - player.radius:
+		if keys[pygame.K_DOWN] and player.y < screenHeight - player.radius - player.vel:
 			player.y += player.vel
 
 		# Check collisions between player and obsticle
