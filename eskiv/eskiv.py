@@ -244,6 +244,13 @@ def playGame():
 					objs.pop(objs.index(obj))
 					generateObj()
 					generateObst()
+		
+		# Check collisions between player and obstacles
+		for obst in obsts:
+			if obst.y - obst.radius < player.y + player.radius and obst.y + obst.radius > player.y - player.radius:
+				if obst.x - obst.radius < player.x + player.radius and obst.x + obst.radius > player.x - player.radius:
+					# Game over
+					return
 
 		redrawGameWindow()
 
