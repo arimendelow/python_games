@@ -153,8 +153,8 @@ def playGame():
 		objs.append(
 			circle(
 				radius = objRad,
-				x = random.randint(obstRad, screenWidth // 2 - obstRad),
-				y = random.randint(obstRad, screenHeight // 2 - obstRad),
+				x = random.randint(obstRad, screenWidth - obstRad),
+				y = random.randint(obstRad, screenHeight - obstRad),
 				color = objColor
 			)
 		)
@@ -163,8 +163,8 @@ def playGame():
 		obsts.append(
 			circle(
 				radius = obstRad,
-				x = random.randint(obstRad, screenWidth // 2 - obstRad),
-				y = random.randint(obstRad, screenHeight // 2 - obstRad),
+				x = random.randint(obstRad, screenWidth - obstRad),
+				y = random.randint(obstRad, screenHeight - obstRad),
 				color = obstColor,
 				vel = obstVel,
 				dir = random.randint(0, 3)
@@ -214,8 +214,12 @@ def playGame():
 			# Game over
 		
 		# Check collisions between player and objective
-		#todo
-		#todo
+		for obj in objs:
+			if obj.y - obj.radius < player.y + player.radius and obj.y + obj.radius > player.y - player.radius:
+				if obj.x - obj.radius < player.x + player.radius and obj.x + obj.radius > player.x - player.radius:
+					score += 1
+					objs.pop(objs.index(obj))
+					generateObj()
 			# Generate new objective
 			#todo
 			# Generate new bad guy
