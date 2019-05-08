@@ -50,6 +50,11 @@ UP = 1
 RIGHT = 2
 DOWN = 3
 
+# Global variables
+player = object
+objs = []
+obsts = []
+
 # For displaying text
 def displayTextCenterAlign(fontSize, text, x, y, color = textColor):
 	font = pygame.font.Font('snake/pixelmix_bold.ttf', fontSize)
@@ -97,8 +102,9 @@ def redrawGameWindow():
 	pygame.display.update()
 
 def waitForStart():
-	global snake
-	global foods
+	global player
+	global objs
+	global obsts
 	global score
 	waiting = True
 	while waiting:
@@ -107,8 +113,10 @@ def waitForStart():
 				pygame.quit()
 				exit()
 			if event.type == pygame.KEYUP:
-				snake = []
-				foods = []
+				# Spawn in the middle of the screen
+				player = circle(playerRad, screenWidth // 2, screenHeight // 2, playerColor, playerVel)
+				objs = []
+				obsts = []
 				score = 0
 				playGame()
 				gameOver()
@@ -134,11 +142,6 @@ def gameOver():
 	waitForStart()
 	
 # ------------------ Main loop ------------------
-
-# Spawn in the middle of the screen
-player = circle(playerRad, screenWidth // 2, screenHeight // 2, playerColor, playerVel)
-objs = []
-obsts = []
 
 def playGame():
 	# Make the characters
