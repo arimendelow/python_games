@@ -27,6 +27,7 @@ blue = (0, 0, 255)
 # Colors of the different elements
 bgColor = black
 paddleColor = white
+ballColor = white
 textColor = white
 
 # Make our window - this is what we'll draw on
@@ -51,7 +52,7 @@ DOWN = 3
 # Global variables
 player = object
 opponent = object
-ball = object
+ball = []
 
 # For displaying text
 def displayTextCenterAlign(fontSize, text, x, y, color = textColor):
@@ -67,7 +68,7 @@ def displayTextLeftAlign(fontSize, text, x, y, color = textColor):
 
 class circle(object):
 	# For if character is a square
-	def __init__(self, radius, x, y, color, vel = 0, dir = LEFT):
+	def __init__(self, radius = ballRad, x = screenWidth // 2, y = screenHeight // 2, color = ballColor, vel = 0, dir = LEFT):
 		self.radius = radius
 		self.x = x
 		self.y = y
@@ -98,17 +99,17 @@ def redrawGameWindow():
 	# Background
 	win.blit(bg, (0,0))
 
-	displayTextLeftAlign(20, f"Score: {score}", 10, 10, textColor)
-	displayTextLeftAlign(15, f"High score: {highScore}", 10, 40, textColor)
+	displayTextCenterAlign(20, f"Score: {score}", screenWidth // 2, 10, textColor)
+	displayTextCenterAlign(15, f"High score: {highScore}", screenWidth // 2, 40, textColor)
 
 	# Draw any characters here
 		# Player
 	player.draw(win)
 		# Objectives
-	# ball.draw(win)
-		# Opponent
+	for b in ball:
+		b.draw(win)
 	
-	# Need to refresh the window to show any updates, ie draws
+	# Need to refresh the window to show any s, ie draws
 	pygame.display.update()
 
 def waitForStart():
@@ -133,7 +134,7 @@ def waitForStart():
 					color = paddleColor
 				)
 				# Generate our first ball
-				# todo
+				ball.append(circle())
 				# Generate our opponent
 				# todo
 				score = 0
