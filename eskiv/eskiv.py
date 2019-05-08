@@ -8,8 +8,8 @@ objRad = 8
 obstRad = 5
 
 # Controls the speed of the elements
-playerVel = 8
-obstVel = 8
+playerVel = 12
+obstVel = 10
 
 # Control the delay of the game - higher numbers means the game moves slower
 gameDelay = 0
@@ -190,7 +190,27 @@ def playGame():
 				run = False
 
 		# Move the obsticles
-		#todo
+		for obst in obsts:
+			# Direction, plus if hitting the edge of the screen, bounce baby bounce
+			if obst.dir == LEFT or obst.dir == RIGHT:
+				# Going off left side
+				if obst.dir == LEFT and obst.x < obst.vel:
+					obst.dir = RIGHT
+				# Going off right side
+				if obst.dir == RIGHT and obst.x > screenWidth - obst.radius:
+					obst.dir = LEFT
+				# Move it
+				obst.x = obst.x + obst.vel if obst.dir == RIGHT else obst.x - obst.vel
+			# If moving up or down
+			else:
+				# Going off top
+				if obst.dir == UP and obst.y < obst.vel:
+					obst.dir = DOWN
+				# Going off bottom
+				if obst.dir == DOWN and obst.y > screenHeight - obst.radius:
+					obst.dir = UP
+				# Move it
+				obst.y = obst.y + obst.vel if obst.dir == DOWN else obst.y - obst.vel
 		
 		# Different ways to check if a key is pressed.
 		# - Can check the event as above, but that won't account for keys being held down
