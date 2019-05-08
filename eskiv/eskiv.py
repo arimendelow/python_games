@@ -244,6 +244,7 @@ def playGame():
 			if obj.y - obj.radius < player.y + player.radius and obj.y + obj.radius > player.y - player.radius:
 				if obj.x - obj.radius < player.x + player.radius and obj.x + obj.radius > player.x - player.radius:
 					score += 1
+					highScore = score if score > highScore else highScore
 					objs.pop(objs.index(obj))
 					generateObj()
 					generateObst()
