@@ -6,16 +6,18 @@ pygame.init() # Always need to do this
 gameName = "Pong"
 
 # Control the size of the elements
-paddleWidth = 10
-paddleHeight = 50
-ballRad = 8
+paddleWidth = 20
+paddleHeight = 100
+ballRad = 16
 
-# Controls the speed of the elements
-paddleVel = 20
-ballVel = 20
+# Controls the speed of the elements - in px/s
+paddleVel = 10
+ballVel = 10
 
 # Allow us to set our FPS
 clock = pygame.time.Clock()
+# redraws per second
+RPS = 10
 
 # Commonly used colors
 black = (0, 0, 0,)
@@ -31,7 +33,7 @@ ballColor = white
 textColor = white
 
 # Make our window - this is what we'll draw on
-screenWidth = 1080
+screenWidth = 720
 screenHeight = 480
 win = pygame.display.set_mode((screenWidth, screenHeight)) # Giving it a touple with the size of the window
 pygame.display.set_caption(gameName) # Give the window a title
@@ -139,8 +141,8 @@ def waitForStart():
 					height = ballRad,
 					x = screenWidth // 2,
 					y = screenHeight // 2,
-					xVel = 0,
-					yVel = - ballVel,
+					xVel = -ballVel,
+					yVel = 0,
 					color = ballColor
 
 				)
@@ -181,9 +183,11 @@ def playGame():
 	global highScore
 
 	run = True
+	timedelta = 0
 	while run:
-
-		clock.tick(60) # Pygame will never show more than 30 frames/second
+		clock.tick(60) # 60 FPS
+		# For tracking how many ms it's been since we last did a display update
+		timedelta += clock.tick(60)
 
 		# Check for events - anything that happens from the user
 		for event in pygame.event.get():
@@ -200,22 +204,32 @@ def playGame():
 		# Left arrow key and don't want them to move off the screen
 		
 		# Paddle can move up and down
-		if keys[pygame.K_UP] and player.y > player.vel:
-			player.y -= player.vel
+		if keys[pygame.K_UP] and player.y > player.yVel:
+			player.y -= player.yVel
 		
-		if keys[pygame.K_DOWN] and player.y < screenHeight - player.height - player.vel:
-			player.y += player.vel
+		if keys[pygame.K_DOWN] and player.y < screenHeight - player.height - player.yVel:
+			player.y += player.yVel
 
 		# Bounce the ball
 		# Off the walls
 		#todo
 
 		# Off the paddle
-		# First of all, did it hit the user's paddle (which, remember, is on the left AKA y = 0)
-			# Hit! Now, bounce.
+		# First of all, did it hit the user's paddle (which, remember, is on the left AKA x = 0)
+		if ball.x <= player.x + player.width and ball.x + ball.width > player.x:
+			if ball.y < player.y + player.height and ball.y + ball.height > player.y:
+				# Hit! Now, bounce.
+				ball.xVel *= -1
+		
+		# Move the ball - rather than controlling the direction of the ball here,
+		# the xVel and yVel are made positive or negative by the code handling bouncing
+		ball.x += ball.xVel
+		ball.y += ball.yVel
 			
-
-		redrawGameWindow()
+		# Limit how often it's redrawn
+		if timedelta > 1000 / RPS:
+			timedelta = 0
+			redrawGameWindow()
 
 	pygame.quit()
 
