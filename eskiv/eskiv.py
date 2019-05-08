@@ -91,7 +91,7 @@ def redrawGameWindow():
 		obj.draw(win)
 		# Obstacles
 	for obst in obsts:
-		obst.draw(obst)
+		obst.draw(win)
 	
 	# Need to refresh the window to show any updates, ie draws
 	pygame.display.update()
@@ -174,6 +174,9 @@ def playGame():
 	# Generate our first objective
 	generateObj()
 
+	# Generate our first obstacle
+	generateObst()
+
 	run = True
 	while run:
 		
@@ -220,10 +223,7 @@ def playGame():
 					score += 1
 					objs.pop(objs.index(obj))
 					generateObj()
-			# Generate new objective
-			#todo
-			# Generate new bad guy
-			#todo
+					generateObst()
 
 		redrawGameWindow()
 
