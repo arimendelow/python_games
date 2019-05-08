@@ -11,7 +11,7 @@ paddleHeight = 50
 ballRad = 8
 
 # Controls the speed of the elements
-playerVel = 12
+paddleVel = 20
 obstVel = 20
 
 # Allow us to set our FPS
@@ -30,7 +30,7 @@ paddleColor = white
 textColor = white
 
 # Make our window - this is what we'll draw on
-screenWidth = 640
+screenWidth = 1080
 screenHeight = 480
 win = pygame.display.set_mode((screenWidth, screenHeight)) # Giving it a touple with the size of the window
 pygame.display.set_caption(gameName) # Give the window a title
@@ -80,11 +80,12 @@ class circle(object):
 		pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
 class rectangle(object):
-	def __init__(self, width, height, x, y, color):
+	def __init__(self, width, height, x, y, vel, color):
 		self.width = width
 		self.height = height
 		self.x = x
 		self.y = y
+		self.vel = vel
 		self.hitbox = (self.x, self.y, self.width, self.height)
 		self.color = color
 
@@ -128,6 +129,7 @@ def waitForStart():
 					height = paddleHeight,
 					x = 0,
 					y = screenHeight // 2 - paddleHeight // 2,
+					vel = paddleVel,
 					color = paddleColor
 				)
 				# Generate our first ball
@@ -171,7 +173,7 @@ def playGame():
 	run = True
 	while run:
 
-		clock.tick(30) # Pygame will never show more than 30 frames/second
+		clock.tick(60) # Pygame will never show more than 30 frames/second
 
 		# Check for events - anything that happens from the user
 		for event in pygame.event.get():
@@ -186,17 +188,12 @@ def playGame():
 		# -------Move the character---------
 		# (Grid (0,0) is top left, bottom right is (max, max))
 		# Left arrow key and don't want them to move off the screen
-
-		if keys[pygame.K_LEFT] and player.x > player.vel:
-			player.x -= player.vel
 		
-		if keys[pygame.K_RIGHT] and player.x < screenWidth - player.radius:
-			player.x += player.vel
-		
+		# Paddle can move up and down
 		if keys[pygame.K_UP] and player.y > player.vel:
 			player.y -= player.vel
 		
-		if keys[pygame.K_DOWN] and player.y < screenHeight - player.radius - player.vel:
+		if keys[pygame.K_DOWN] and player.y < screenHeight - player.height - player.vel:
 			player.y += player.vel
 
 
