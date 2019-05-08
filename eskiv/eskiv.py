@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 pygame.init() # Always need to do this
 
 # Control the size of the elements
@@ -241,18 +242,18 @@ def playGame():
 		
 		# Check collisions between player and objective
 		for obj in objs:
-			if obj.y - obj.radius < player.y + player.radius and obj.y + obj.radius > player.y - player.radius:
-				if obj.x - obj.radius < player.x + player.radius and obj.x + obj.radius > player.x - player.radius:
-					score += 1
-					highScore = score if score > highScore else highScore
-					objs.pop(objs.index(obj))
-					generateObj()
-					generateObst()
+			dist = math.hypot(obj.x - player.x, obj.y - player.y)
+			if dist <= player.radius + obj.radius:
+				score += 1
+				highScore = score if score > highScore else highScore
+				objs.pop(objs.index(obj))
+				generateObj()
+				generateObst()
 		
 		# Check collisions between player and obstacles
 		for obst in obsts:
-			if obst.y - obst.radius < player.y + player.radius and obst.y + obst.radius > player.y - player.radius:
-				if obst.x - obst.radius < player.x + player.radius and obst.x + obst.radius > player.x - player.radius:
+			dist = math.hypot(obst.x - player.x, obst.y - player.y)
+			if dist <= player.radius + obst.radius:
 					# Game over
 					return
 
