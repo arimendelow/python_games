@@ -20,7 +20,7 @@ ballVel = 10
 # Allow us to set our FPS
 clock = pygame.time.Clock()
 # redraws per second
-RPS = 20
+RPS = 30
 
 # Commonly used colors
 black = (0, 0, 0,)
@@ -215,7 +215,12 @@ def playGame():
 
 		# Bounce the ball
 		# Off the walls
-		#todo
+		# Top wall (minus because yVel will be negative) & bottom wall
+		if ball.y <= 0 - ball.yVel or ball.y >= screenHeight - ball.height:
+			ball.yVel *= -1 # Bounce
+		# Right wall - for testing (diable this once the opponent has been added)
+		if ball.x >= screenWidth - ball.width - ball.xVel:
+			ball.xVel *= -1 # Bounce
 
 		# Off the paddle
 		# First of all, did it hit the user's paddle (which, remember, is on the left AKA x = 0)
@@ -223,14 +228,14 @@ def playGame():
 			if ball.y < player.y + player.height and ball.y + ball.height > player.y:
 				# Hit! Now, bounce.
 				# How far is the ball from the center of the paddle?
-				ballCenter = ball.y + ballRad // 2
-				paddleCenter = player.y + paddleHeight // 2
-				ballDelta = ballCenter - paddleCenter # Negative if the ball is on the higher half of the paddle
+				ballCenter = ball.y + ballRad / 2
+				paddleCenter = player.y + paddleHeight / 2
+				ballDelta = ballCenter - paddleCenter  # Negative if the ball is on the higher half of the paddle
 				# Scale this delta into angle of reflection, from 0 to ±maxAngle°
-				ballAngle = ballDelta * maxAngle / (paddleHeight / 2)
+				ballAngle = (ballDelta * maxAngle) / (paddleHeight / 2)
 				# Now, break up the ball velocity into its x and y components according to this angle
-				ball.xVel = abs(math.cos(ballAngle) * ballVel) # abs cuz it needs to be moving right after the bounce
-				ball.yVel = math.cos(ballAngle) * ballVel
+				ball.xVel = abs(math.cos(ballAngle) * ballVel) # abs cuz it needs to be moving right after the bounce (positive value)
+				ball.yVel = math.sin(ballAngle) * ballVel
 		
 		# Move the ball - rather than controlling the direction of the ball here,
 		# the xVel and yVel are made positive or negative by the code handling bouncing
