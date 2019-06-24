@@ -10,6 +10,7 @@ def main():
 	print("Let's play!")
 	board.printBoard()
 	while(board.winnerIs() == None):
+		print(f"\n{board.turn}'s turn!")
 		move = list(input("Where do you want to go?\n")) # This will be something like 1A, 2C etc (see the board printout)
 		board.go(move[0], move[1])
 		board.printBoard()
@@ -29,8 +30,8 @@ class Board:
 
 	def go(self, row, col):
 		# Convert x and y into indices of the board
-		row = ord(col.lower()) - 97
-		col = int(row) - 1 # Zero index it
+		row = ord(row.lower()) - 97
+		col = int(col) - 1 # Zero index it
 		self.board[row][col] = self.turn
 		if self.turn == self.p1:
 			self.turn = self.p2
