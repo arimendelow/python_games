@@ -19,7 +19,7 @@ class Board:
 	def __init__(self, p1='X', p2='O'):
 		self.p1 = p1
 		self.p2 = p2
-		self.board = [[' '] * 3] * 9 # Initialize the board to 3 rows of 3 blank values
+		self.board = [[' '] * 3] * 3 # Initialize the board to 3 rows of 3 blank values
 		self.turn = self.p1 # P1 goes first
 
 	def go(self, row, col):
