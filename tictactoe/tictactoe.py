@@ -8,10 +8,11 @@ def main():
 	else:
 		board = Board()
 	print("Let's play!")
+	board.printBoard()
 	while(board.winnerIs() == None):
-		board.printBoard()
 		move = list(input("Where do you want to go?\n")) # This will be something like 1A, 2C etc (see the board printout)
 		board.go(move[0], move[1])
+		board.printBoard()
 	print(f"{board.winnerIs()} wins!")
 
 class Board:
