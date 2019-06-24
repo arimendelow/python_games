@@ -8,40 +8,87 @@ def main():
 	else:
 		board = Board()
 	print("Let's play!")
-	board.isGameOver()
-
+	while(board.winnerIs() == None):
+		board.printBoard()
+		move = list(input("Where do you want to go?\n")) # This will be something like 1A, 2C etc (see the board printout)
+		board.go(move[0], move[1])
+	print(f"{board.winnerIs()} wins!")
 
 class Board:
 	def __init__(self, p1='X', p2='O'):
 		self.p1 = p1
 		self.p2 = p2
-		self.board = [' '] * 9 # Initialize the board to 9 blank values
-	
+		self.board = [[' '] * 3] * 9 # Initialize the board to 3 rows of 3 blank values
+		self.turn = self.p1 # P1 goes first
+
+	def go(self, row, col):
+		# Convert x and y into indices of the board
+		row = int(row) - 1 # Zero index it
+		col = ord(col.lower()) - 97
+		self.board[row][col] = self.turn
+		if self.turn == self.p1:
+			self.turn = self.p2
+		else:
+			self.turn = self.p1
+
 	def printBoard(self):
 		print("   A   B   C")
-		print(f"1  {self.board[0]} | {self.board[1]} | {self.board[2]}")
+		print(f"1  {self.board[0][0]} | {self.board[0][1]} | {self.board[0][2]}")
 		print("  ---+---+---")
-		print(f"2  {self.board[3]} | {self.board[4]} | {self.board[5]}")
+		print(f"2  {self.board[1][0]} | {self.board[1][1]} | {self.board[1][2]}")
 		print("  ---+---+---")
-		print(f"3  {self.board[6]} | {self.board[7]} | {self.board[8]}")
+		print(f"3  {self.board[2][2]} | {self.board[2][1]} | {self.board[2][2]}")
 	
-	def isGameOver(self):
+	def winnerIs(self):
+		#	checks following combinations, after checking if not empty
+		#		* * *
+		#		- - -
+		#		- - -
+		#		
+		# 	- - -
+		#		* * *
+		#		- - -
+		#
+		#		- - -
+		#		- - -
+		#		* * *
+		#
+		#		* - -
+		#		- * -
+		#		- - *
+		#
+		#		- - *
+		#		- * -
+		#		* - -
+		#
+		#		* - -
+		#		* - -
+		#		* - -
+		#		
+		# 	- * -
+		#		- * -
+		#		- * -
+		#
+		#		- - *
+		#		- - *
+		#		- - *
+
 		winningCombos = [
-			[0, 1, 2],
-			[3, 4, 5],
-			[6, 7, 8],
-			[0, 3, 6],
-			[1, 4, 7],
-			[2, 5, 8],
-			[0, 4, 8],
-			[2, 4, 6]
+			[[0, 0], [0, 1], [0, 2]],
+			[[1, 0], [1, 1], [1, 2]],
+			[[2, 0], [2, 1], [2, 2]],
+			[[0, 0], [1, 1], [2, 2]],
+			[[0, 2], [1, 1], [2, 0]],
+			[[0, 0], [1, 0], [2, 0]],
+			[[0, 1], [1, 1], [2, 1]],
+			[[0, 2], [1, 2], [2, 2]],
 		]
 		for combo in winningCombos:
 			[a, b, c] = combo
-			# Check if match
-			if (self.board[a] != ' ' and self.board[a] == self.board[b] and self.board[a] == self.board[c]):
+			# Check if match - need to turn the list of coordinates from above into two distinct integer indices
+			if (self.board[a[0]][a[1]] != ' ' and self.board[a[0]][a[1]] == self.board[b[0]][b[1]] and self.board[a[0]][a[1]] == self.board[c[0]][c[1]]):
 				# Return the glyph of the winner
-				return self.board[a]
+				return self.board[a[0]][a[1]]
 		# No winner yet
 		return None
 
