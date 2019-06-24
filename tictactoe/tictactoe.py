@@ -29,8 +29,8 @@ class Board:
 
 	def go(self, row, col):
 		# Convert x and y into indices of the board
-		row = int(row) - 1 # Zero index it
-		col = ord(col.lower()) - 97
+		row = ord(col.lower()) - 97
+		col = int(row) - 1 # Zero index it
 		self.board[row][col] = self.turn
 		if self.turn == self.p1:
 			self.turn = self.p2
@@ -38,12 +38,12 @@ class Board:
 			self.turn = self.p1
 
 	def printBoard(self):
-		print("   A   B   C")
-		print(f"1  {self.board[0][0]} | {self.board[0][1]} | {self.board[0][2]}")
+		print("   1   2   3")
+		print(f"A  {self.board[0][0]} | {self.board[0][1]} | {self.board[0][2]}")
 		print("  ---+---+---")
-		print(f"2  {self.board[1][0]} | {self.board[1][1]} | {self.board[1][2]}")
+		print(f"B  {self.board[1][0]} | {self.board[1][1]} | {self.board[1][2]}")
 		print("  ---+---+---")
-		print(f"3  {self.board[2][0]} | {self.board[2][1]} | {self.board[2][2]}")
+		print(f"C  {self.board[2][0]} | {self.board[2][1]} | {self.board[2][2]}")
 	
 	def winnerIs(self):
 		#	checks following combinations, after checking if not empty
