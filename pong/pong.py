@@ -8,19 +8,20 @@ gameName = "Pong"
 # Control the size of the elements
 paddleWidth = 20
 paddleHeight = 100
-ballRad = 16
+ballRad = 15
 
 # What is the maximum angle (in degrees) of reflection from the paddle?
-maxAngle = 45
+maxAngle = 30
 
 # Controls the speed of the elements - in px/s
-paddleVel = 10
-ballVel = 10
+paddleVel = 25
+ballVel = 20
 
 # Allow us to set our FPS
 clock = pygame.time.Clock()
+fps = 120
 # redraws per second
-RPS = 30
+RPS = 120
 
 # Commonly used colors
 black = (0, 0, 0,)
@@ -28,17 +29,18 @@ white = (255, 255, 255)
 red = (255, 0, 0,)
 green = (0, 255, 0)
 blue = (0, 0, 255)
+yellow = (255, 255, 0)
 
 # Colors of the different elements
 bgColor = black
 paddleColor = white
-ballColor = white
+ballColor = red
 textColor = white
 
 # Make our window - this is what we'll draw on
 screenWidth = 720
 screenHeight = 480
-win = pygame.display.set_mode((screenWidth, screenHeight)) # Giving it a touple with the size of the window
+win = pygame.display.set_mode((screenWidth, screenHeight), 0, 16) # Giving it a touple with the size of the window
 pygame.display.set_caption(gameName) # Give the window a title
 bg = pygame.Surface(win.get_size())
 bg = bg.convert()
@@ -57,7 +59,8 @@ DOWN = 3
 # Global variables
 player = object
 opponent = object
-ball = object
+# ball = object
+balls = []
 
 # For displaying text
 def displayTextCenterAlign(fontSize, text, x, y, color = textColor):
@@ -70,20 +73,6 @@ def displayTextLeftAlign(fontSize, text, x, y, color = textColor):
 	font = pygame.font.Font(f"{gameName}/pixelmix_bold.ttf", fontSize)
 	text = font.render(text, True, color)
 	win.blit(text, (x, y))
-
-# class circle(object):
-# 	# For if character is a square
-# 	def __init__(self, radius = ballRad, x = screenWidth // 2, y = screenHeight // 2, color = ballColor, xvel = 0, dir = LEFT):
-# 		self.radius = radius
-# 		self.x = x
-# 		self.y = y
-# 		self.color = color
-# 		self.vel = vel
-# 		self.dir = dir
-
-# 	def draw(self, win):
-# 		# Draw the circle
-# 		pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
 class rectangle(object):
 	def __init__(self, width, height, x, y, xVel = 0, yVel = 0, color = white):
@@ -112,14 +101,16 @@ def redrawGameWindow():
 		# Player
 	player.draw(win)
 		# Objectives
-	ball.draw(win)
+	for ball in balls:
+		ball.draw(win)
 	
 	# Need to refresh the window to show any s, ie draws
 	pygame.display.update()
 
 def waitForStart():
 	global player
-	global ball
+	# global ball
+	global balls
 	global opponent
 	global score
 	waiting = True
@@ -138,17 +129,52 @@ def waitForStart():
 					yVel = paddleVel,
 					color = paddleColor
 				)
-				# Generate our first ball
-				ball = rectangle(
+				balls.append(rectangle(
 					width = ballRad,
 					height = ballRad,
-					x = screenWidth // 2,
-					y = screenHeight // 2,
+					x = screenWidth // 2 - ballRad // 2,
+					y = screenHeight // 2 - ballRad // 2,
 					xVel = -ballVel,
 					yVel = 0,
 					color = ballColor
-
-				)
+				))
+				# These are all for testing
+				# balls.append(rectangle(
+				# 	width = ballRad,
+				# 	height = ballRad,
+				# 	x = screenWidth // 2 - ballRad // 2,
+				# 	y = screenHeight // 2 - ballRad // 2 + 20,
+				# 	xVel = -ballVel,
+				# 	yVel = 0,
+				# 	color = blue
+				# ))
+				# balls.append(rectangle(
+				# 	width = ballRad,
+				# 	height = ballRad,
+				# 	x = screenWidth // 2 - ballRad // 2,
+				# 	y = screenHeight // 2 - ballRad // 2 - 20,
+				# 	xVel = -ballVel,
+				# 	yVel = 0,
+				# 	color = green
+				# ))
+				# balls.append(rectangle(
+				# 	width = ballRad,
+				# 	height = ballRad,
+				# 	x = screenWidth // 2 - ballRad // 2,
+				# 	y = screenHeight // 2 - ballRad // 2 + 40,
+				# 	xVel = -ballVel,
+				# 	yVel = 0,
+				# 	color = red
+				# ))
+				# balls.append(rectangle(
+				# 	width = ballRad,
+				# 	height = ballRad,
+				# 	x = screenWidth // 2 - ballRad // 2,
+				# 	y = screenHeight // 2 - ballRad // 2 - 40,
+				# 	xVel = -ballVel,
+				# 	yVel = 0,
+				# 	color = yellow
+				# ))
 				# Generate our opponent
 				# todo
 				score = 0
@@ -180,7 +206,8 @@ def gameOver():
 def playGame():
 
 	global player
-	global ball
+	# global ball
+	global balls
 	global opponent
 	global score
 	global highScore
@@ -188,7 +215,7 @@ def playGame():
 	run = True
 	timedelta = 0
 	while run:
-		clock.tick(60) # 60 FPS
+		clock.tick(fps) # set FPS
 		# For tracking how many ms it's been since we last did a display update
 		timedelta += clock.tick(60)
 
@@ -212,35 +239,36 @@ def playGame():
 		
 		if keys[pygame.K_DOWN] and player.y < screenHeight - player.height - player.yVel:
 			player.y += player.yVel
+		for ball in balls:
+			# Bounce the ball
+			# Off the walls
+			# Top wall (minus because yVel will be negative) & bottom wall
+			if ball.y <= 0 - ball.yVel or ball.y >= screenHeight - ball.height:
+				ball.yVel *= -1 # Bounce
+			# Right wall - for testing (diable this once the opponent has been added)
+			if ball.x >= screenWidth - ball.width - ball.xVel:
+				ball.xVel *= -1 # Bounce
 
-		# Bounce the ball
-		# Off the walls
-		# Top wall (minus because yVel will be negative) & bottom wall
-		if ball.y <= 0 - ball.yVel or ball.y >= screenHeight - ball.height:
-			ball.yVel *= -1 # Bounce
-		# Right wall - for testing (diable this once the opponent has been added)
-		if ball.x >= screenWidth - ball.width - ball.xVel:
-			ball.xVel *= -1 # Bounce
-
-		# Off the paddle
-		# First of all, did it hit the user's paddle (which, remember, is on the left AKA x = 0)
-		if ball.x <= player.x + player.width and ball.x + ball.width > player.x:
-			if ball.y < player.y + player.height and ball.y + ball.height > player.y:
-				# Hit! Now, bounce.
-				# How far is the ball from the center of the paddle?
-				ballCenter = ball.y + ballRad / 2
-				paddleCenter = player.y + paddleHeight / 2
-				ballDelta = ballCenter - paddleCenter  # Negative if the ball is on the higher half of the paddle
-				# Scale this delta into angle of reflection, from 0 to ±maxAngle°
-				ballAngle = (ballDelta * maxAngle) / (paddleHeight / 2)
-				# Now, break up the ball velocity into its x and y components according to this angle
-				ball.xVel = abs(math.cos(ballAngle) * ballVel) # abs cuz it needs to be moving right after the bounce (positive value)
-				ball.yVel = math.sin(ballAngle) * ballVel
-		
-		# Move the ball - rather than controlling the direction of the ball here,
-		# the xVel and yVel are made positive or negative by the code handling bouncing
-		ball.x += ball.xVel
-		ball.y += ball.yVel
+			# Off the paddle
+			# First of all, did it hit the user's paddle (which, remember, is on the left AKA x = 0)
+			if ball.x < player.x + player.width and ball.x + ball.width > player.x + player.width:
+				if ball.y < player.y + player.height and ball.y + ball.height > player.y:
+					# Hit! Now, bounce.
+					# How far is the ball from the center of the paddle?
+					ballCenter = ball.y + ballRad / 2
+					paddleCenter = player.y + paddleHeight / 2
+					ballDelta = ballCenter - paddleCenter # Negative if the ball is on the higher half of the paddle
+					# Scale this delta into angle of reflection, from 0 to ±maxAngle°
+					ballAngle = (ballDelta * maxAngle) / (paddleHeight / 2)
+					print(ballAngle)
+					# Now, break up the ball velocity into its x and y components according to this angle
+					ball.xVel = abs(math.cos(ballAngle) * ballVel) # abs cuz it needs to be moving right after the bounce (positive value)
+					ball.yVel = math.sin(ballAngle) * ballVel
+			
+			# Move the ball - rather than controlling the direction of the ball here,
+			# the xVel and yVel are made positive or negative by the code handling bouncing
+			ball.x += ball.xVel
+			ball.y += ball.yVel
 			
 		# Limit how often it's redrawn
 		if timedelta > 1000 / RPS:

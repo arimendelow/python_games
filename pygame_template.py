@@ -16,6 +16,10 @@ bg = pygame.Surface(win.get_size())
 bg = bg.convert()
 bg.fill(black)
 
+# Allow us to change our FPS
+clock = pygame.time.Clock()
+fps = 27 # Will get "list index out of range" if we go above this
+
 # Track score
 score = 0
 
@@ -64,6 +68,8 @@ p1 = player(width = p1Width,
 
 run = True
 while run:
+	clock.tick(fps)
+
 	# Check for events - anything that happens from the user
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT: # If the exit button is pressed

@@ -25,8 +25,7 @@ green = (0, 128, 0)
 # Track score
 score = 0
 
-
-pygame.display.set_caption("First Game") # Give the window a title
+pygame.display.set_caption("Silly Dumb Test Game HOORAY! (in all honesty you cannot win this game)") # Give the window a title
 
 class player(object):
 	# Load images
@@ -90,7 +89,7 @@ class player(object):
 		self.y = screenHeight -  characterHeight - 10
 		self.walkCount = 0
 		font1 = pygame.font.Font('pixelmix_bold.ttf', 50) # Size 30
-		text = font1.render(f"You lose!", 1, red)
+		text = font1.render("You lose!", 1, red)
 		win.blit(text, (screenWidth // 2 - text.get_width() // 2, screenHeight // 2 - text.get_height()))
 		pygame.display.update()
 
