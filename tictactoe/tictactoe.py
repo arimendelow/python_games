@@ -43,7 +43,7 @@ class Board:
 		print("  ---+---+---")
 		print(f"2  {self.board[1][0]} | {self.board[1][1]} | {self.board[1][2]}")
 		print("  ---+---+---")
-		print(f"3  {self.board[2][2]} | {self.board[2][1]} | {self.board[2][2]}")
+		print(f"3  {self.board[2][0]} | {self.board[2][1]} | {self.board[2][2]}")
 	
 	def winnerIs(self):
 		#	checks following combinations, after checking if not empty
